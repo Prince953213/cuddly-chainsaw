@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Video Downloader</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>All-in-One Video Downloader</h2>
+    <input type="text" id="urlInput" placeholder="Paste video link here..." />
+    <button onclick="downloadVideo()">Download</button>
+    <p id="message" class="message"></p>
+  </div>
+
+  <script>
+    async function downloadVideo() {
+      const url = document.getElementById("urlInput").value.trim();
+      const msg = document.getElementById("message");
+      msg.innerText = "Processing...";
+
+      try {
+        const response = await fetch("/api/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+          msg.innerHTML = "✅ Click below to download:<br><a href='/download/" + data.filename + "' download>Download Now</a>";
+        } else {
+          msg.innerText = "❌ " + (data.error || "Unknown error");
+        }
+      } catch (err) {
+        msg.innerText = "❌ Failed to connect to server";
+      }
+    }
+  </script>
+</body>
+</html>
